@@ -142,8 +142,7 @@ class DbService():
 
             response = self.container.read_item(item=id, partition_key=partitionKey)
 
-            logger.info("Item {0} retrieved.".format(response[partitionKey]))
-            logger.debug("Item: {0}".format(response))
+            logger.info("Item retrieved: {0}.".format(response))
             
             # Convert result to json and return generic object.
             j = json.dumps(response)
