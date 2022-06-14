@@ -1,6 +1,6 @@
-class UserNotFoundError(Exception):
+class CredentialNotInJwtError(Exception):
     """
-    The user was not found in the database.
+    The credential expected in the JWT was not present.
     """
 
     def __init__(self, message: str = None):

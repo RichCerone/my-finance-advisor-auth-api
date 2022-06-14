@@ -5,7 +5,11 @@ class BCryptHelper():
     Helps with hashing using bcrypt 
     """
 
-    def verify_password(self, password, hashed_password) -> bool:
+    def __init__(self):
+        pass
+    
+
+    def verify_password(self, password: str, hashed_password: str) -> bool:
         """
         Verifies the password.
 
@@ -27,7 +31,7 @@ class BCryptHelper():
         return passwordContext.verify(password, hashed_password)
 
 
-    def get_password_hash(self, password) -> str:
+    def get_password_hash(self, password: str) -> str:
         """
         Gets the password hash with the given password.
 
@@ -44,6 +48,7 @@ class BCryptHelper():
 
         passwordContext = self.__create_password_context()
         return passwordContext.hash(password)
+
 
     # Creates a crypto context for hashing using the bcrypt algorithm.
     def __create_password_context(self) -> CryptContext:

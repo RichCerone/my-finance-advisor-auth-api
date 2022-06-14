@@ -1,9 +1,9 @@
-class CredentialNotInJwtError(Exception):
+class AccessDeniedError(Exception):
     """
-    The credential expected in the JWT was not present.
+    The password is invalid.
     """
 
-    def __init__(self, message: str):
+    def __init__(self, message: str = None):
         """
         Parameters
         ----------

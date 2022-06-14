@@ -1,6 +1,9 @@
+import logging as logger
+
 from datetime import datetime, timedelta
-from jose import JWTError, jwt
-from src.exceptions.CredentialNotInJwtError import CredentialNotInJwtError
+from jose import jwt
+from jose.exceptions import JWTError, JWTClaimsError, ExpiredSignatureError
+from src.token_helper.exceptions.CredentialNotInJwtError import CredentialNotInJwtError
 
 class TokenHelper():
     """
@@ -37,7 +40,7 @@ class TokenHelper():
         self.access_token_expire_minutes = access_token_expire_minutes
 
 
-    def create_access_token(self, data: dict, expires: bool=True) -> any:
+    def create_access_token(self, data: dict, expires: bool=True) -> str:
         """
         Creates the access token.
 
@@ -63,20 +66,37 @@ class TokenHelper():
             Raised if an unexpected error occurs.
         """
         try:
+            logger.debug("Copying data to encode.")
+
             to_encode = data.copy()
+
+            logger.debug("Data copied. Checking if token needs to expire.")
+
             if expires:
+                logger.debug("Token will expire in {0} minutes".format(self.access_token_expire_minutes))
+
                 expire = datetime.utcnow() + timedelta(minutes=self.access_token_expire_minutes)
+
+                logger.debug("Updating data to include expiration datetime.")
+
                 to_encode.update({ "exp": expire })
 
+            logger.debug("Encoding token.")
+
             encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algo)
+
+            logger.debug("Token encoded.")
+
             return encoded_jwt
 
         except JWTError as e:
+            logger.exception("create_access_token exception -> Error occurred during encoding: {0}".format(e))
             raise
         except Exception as e:
+            logger.exception("create_access_token exception -> Error occurred creating the token: {0}".format(e))
             raise
 
-    def decode_access_token(self, token) -> str:
+    def decode_access_token(self, token: str) -> str:
         """
         Decodes the access token.
 
@@ -87,6 +107,12 @@ class TokenHelper():
 
         Raises
         -----
+        JWTClaimsError:
+            Raised if the claim in the token is invalid.
+
+        ExpiredSignatureError:
+            Raised if the signature signing the token is invalid.
+
         JWTError:
             Raised if the token cannot be decoded.
 
@@ -100,14 +126,34 @@ class TokenHelper():
         """
         
         try:
+            logger.debug("Decoding token: '{0}'".format(token))
+
             payload = jwt.decode(token, self.secret_key, algorithms=[self.algo])
+
+            logger.debug("Token decoded. Retrieving username payload.")
+
             username: str = payload.get("sub")
             if username is None or username.isspace():
+                logger.error("Username payload is not defined.")
                 raise CredentialNotInJwtError("Expected 'sub' credential in the payload, but it was not found.")
+
+        except JWTClaimsError as e:
+            logger.exception("decode_access_token exception -> The claim in the token is invalid: {0}".format(e))
+            raise
+
+        except ExpiredSignatureError as e:
+            logger.exception("decode_access_token exception -> The signature is invalid: {0}".format(e))
+            raise
+
         except JWTError as e:
+            logger.exception("decode_access_token exception -> cannot decode token: {0}".format(e))
             raise
+
         except Exception as e:
+            logger.exception("decode_access_token exception -> An error occurred trying to decode the token: {0}".format(e))
             raise
+        
+        logger.debug("username extracted from token.")
         
         return username
     
