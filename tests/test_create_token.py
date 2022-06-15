@@ -1,11 +1,6 @@
-import json
-
 from fastapi.testclient import TestClient
-from jose import JWTError
-from src.data_models.User import User
-from src.main import app, Token, init_users_db, init_token_helper, init_bcrypt_helper
-from src.libs.api_models.Credentials import Credentials
-from unittest.mock import Mock
+from src.main import app, Credentials, User, Token, JWTError, json, init_users_db, init_token_helper, init_bcrypt_helper
+from unittest.mock import Mock 
 
 # Setup
 def init_users_db_override_201():
