@@ -7,7 +7,7 @@ from jose import JWTError
 from src.exceptions.UserNotFoundError import UserNotFoundError
 from src.exceptions.UserAlreadyExistsError import UserAlreadyExists
 from src.exceptions.AccessDeniedError import AccessDeniedError
-from src.authorization.JwtBearer import JWTBearer
+from src.authorization.JwtBearer import inject_jwt_bearer
 from src.documentation.docs import *
 from src.libs.api_models.Token import Token
 from src.libs.api_models.Credentials import Credentials
@@ -35,6 +35,7 @@ DATABASE_ID = ""
 CONTAINER_ID = ""
 
 # Initialize services.
+# TODO: Does it make sense to wrap these into its own package to re-use across APIs?
 def init_token_helper() -> TokenHelper:
     """
     Initializes a token helper service.
@@ -47,6 +48,7 @@ def init_token_helper() -> TokenHelper:
 
     return TokenHelper(SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES)
 
+
 def init_bcrypt_helper() -> BCryptHelper:
     """
     Initializes a bcrypt helper service.
@@ -58,6 +60,7 @@ def init_bcrypt_helper() -> BCryptHelper:
     """
 
     return BCryptHelper()
+
 
 def init_users_db() -> DbService:
     """
@@ -79,6 +82,7 @@ def init_users_db() -> DbService:
     users_db.connect()
 
     return users_db
+
 
 def authorize_access(request: Request) -> str:
     """
@@ -136,12 +140,32 @@ def authorize_access(request: Request) -> str:
         logger.exception("authorize_access exception -> An error occurred processing the token: {0}".format(e))
         raise HTTPException(500, "Authorization token cannot be processed.")
 
-def credential_validation(credentials: Credentials):
-    logger.info("Validating credential parameters.")
 
-    ModelValidators.validate_credentials(credentials)
+def credential_validation(credentials: Credentials):
+    """
+    Provides validation on the passed credentials.
+
+    Parameters
+    ----------
+    credentials: Credentials
+        Credentials to validate.
+
+    Raises
+    ------
+    HTTPException
+        400 - Raised if the parameters are invalid.
+    """
+
+    try:
+        logger.info("Validating credential parameters.")
+
+        ModelValidators.validate_credentials(credentials)
         
-    logger.info("Credential parameters are valid.")
+        logger.info("Credential parameters are valid.")
+    
+    except ValueError as e:
+        logger.exception("credential_validation exception -> Error occurred validating credentials: {0}".format(e))
+        raise HTTPException(400, str(e))
 
 # End of service initialization.
 
@@ -206,7 +230,7 @@ bcrypt_helper: BCryptHelper = Depends(init_bcrypt_helper)):
             raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 
-@app.post("/users/", status_code=201, responses=create_user_responses, dependencies=[Depends(JWTBearer()), Depends(credential_validation)], response_model=Credentials, tags=["users"])
+@app.post("/users/", status_code=201, responses=create_user_responses, dependencies=[Depends(inject_jwt_bearer), Depends(credential_validation)], response_model=Credentials, tags=["users"])
 def create_user(credentials: Credentials, 
 users_db: DbService = Depends(init_users_db), 
 bcrypt_helper: BCryptHelper = Depends(init_bcrypt_helper),
@@ -241,7 +265,7 @@ user: str = Depends(authorize_access)):
         return credentials
 
     except Exception as e:
-        logger.exception("PUT exception on create_user -> {0}".format(e))
+        logger.exception("POST exception on 'create_user' -> {0}".format(e))
         
         if e.__class__ == ValueError:
             raise HTTPException(status_code=400, detail=str(e))

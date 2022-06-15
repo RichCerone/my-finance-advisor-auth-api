@@ -15,6 +15,11 @@ class JWTBearer(HTTPBearer):
         if credentials:
             if not credentials.scheme == "Bearer":
                 raise HTTPException(status_code=403, detail="Invalid authentication scheme.")
+
             return credentials.credentials
+            
         else:
             raise HTTPException(status_code=403, detail="Invalid authorization code.")
+
+# This is used when you want to inject the caller as a dependency. This way it can be mocked during testing.
+inject_jwt_bearer = JWTBearer()
