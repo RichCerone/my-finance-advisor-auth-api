@@ -84,6 +84,7 @@ def test_create_user_returns_409():
 
     assert response.status_code == 409
 
+# Assert a 500 status code is returned.
 def test_create_user_returns_500():
     app.dependency_overrides[inject_jwt_bearer] = init_jwt_bearer_override_success
     app.dependency_overrides[authorize_access] = init_authorize_access_success
