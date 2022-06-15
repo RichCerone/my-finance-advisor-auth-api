@@ -1,8 +1,22 @@
 from src.libs.api_models.Credentials import Credentials
 
-def validateCredentials(credentials: Credentials):
+def validate_credentials(credentials: Credentials):
+    """
+    Validates the credential data.
+
+    Parameters
+    ----------
+    credentials: Credentials
+        The credentials to be validated.
+
+    Raises
+    ------
+    ValueError
+        Raised if a parameter is invalid.
+    """
+
     if credentials is None:
-        raise ValueError("credential must be defined.")
+        raise ValueError("credentials must be defined.")
 
     if credentials.username is None or credentials.username.isspace():
         raise ValueError("username must be defined.")
