@@ -1,8 +1,19 @@
 from fastapi.testclient import TestClient
-from src.main import app, inject_jwt_bearer, Credentials, User, json, init_users_db, init_token_helper, init_bcrypt_helper, authorize_access
+from src.main import app, inject_jwt_bearer, Settings, Credentials, User, json, init_settings, init_users_db, init_token_helper, init_bcrypt_helper, authorize_access
 from unittest.mock import Mock
 
 # Setup
+def init_settings_override():
+    return Settings(
+        secret_key="some_key", 
+        algorithm="some_algo", 
+        access_token_expire_minutes=30,
+        endpoint="some_endpoint", 
+        key="some_key",
+        database_id="some_id",
+        container_id="some_id"
+    )
+
 def init_jwt_bearer_override_success():
     return "some_token"
     
@@ -48,6 +59,7 @@ def init_authorize_access_success():
     return "some_user"
 
 client = TestClient(app)
+app.dependency_overrides[init_settings] = init_settings # Override for all tests.
 
 # Test
 # Asserts a 200 status code is returned.

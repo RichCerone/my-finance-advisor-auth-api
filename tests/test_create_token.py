@@ -1,8 +1,19 @@
 from fastapi.testclient import TestClient
-from src.main import app, Credentials, User, Token, JWTError, json, init_users_db, init_token_helper, init_bcrypt_helper
+from src.main import app, Settings, Credentials, User, Token, JWTError, json, init_settings, init_users_db, init_token_helper, init_bcrypt_helper
 from unittest.mock import Mock 
 
 # Setup
+def init_settings_override():
+    return Settings(
+        secret_key="some_key", 
+        algorithm="some_algo", 
+        access_token_expire_minutes=30,
+        endpoint="some_endpoint", 
+        key="some_key",
+        database_id="some_id",
+        container_id="some_id"
+    )
+
 def init_users_db_override_201():
     users_db_mock = Mock()
     users_db_mock.get.return_value = json.dumps(User("user", "password").__dict__)
@@ -52,6 +63,7 @@ def init_bcrypt_helper_override_failure():
     return bcrypt_helper_mock
 
 client = TestClient(app)
+app.dependency_overrides[init_settings] = init_settings # Override for all tests.
 
 # Test
 # Assert a 201 status code is returned.
