@@ -59,7 +59,7 @@ def init_authorize_access_success():
     return "some_user"
 
 client = TestClient(app)
-app.dependency_overrides[init_settings] = init_settings # Override for all tests.
+app.dependency_overrides[init_settings] = init_settings_override # Override for all tests.
 
 # Test
 # Asserts a 200 status code is returned.
