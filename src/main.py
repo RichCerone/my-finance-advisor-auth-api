@@ -32,7 +32,7 @@ try:
     settings = Settings()
 
 except:
-    logger.exception("NO ENV VARS FOUND WILL CONTINUE WITH DEFAULT VALUES THIS WILL CAUSE APP TO FAIL.")
+    logger.exception("NO ENV VARS FOUND: WILL CONTINUE WITH DEFAULT VALUES. THIS WILL CAUSE APP TO FAIL.")
     settings = Settings(secret_key="NONE", algorithm="NONE", endpoint="NONE", key="NONE", database_id="NONE", container_id="NONE")
 
 SECRET_KEY = settings.secret_key
@@ -46,7 +46,7 @@ CONTAINER_ID = settings.container_id
 # Initialize services.
 # TODO: Does it make sense to wrap these into its own package to re-use across APIs?
 
-# Startup DB.
+# Setup DB.
 db_options = DbOptions(
         settings.endpoint, 
         settings.key,
