@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from src.config import Settings
 from src.main import app, Credentials, User, Token, JWTError, json, init_users_db, init_token_helper, init_bcrypt_helper
 from unittest.mock import Mock 
 

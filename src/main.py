@@ -15,6 +15,7 @@ from src.token_helper.TokenHelper import TokenHelper
 from src.hashing.HashingHelper import BCryptHelper
 from src.db_service.DbService import DbService, DbOptions
 from src.data_models.User import User
+from src.config import Settings
 
 # Start API.
 app = FastAPI(
@@ -26,16 +27,35 @@ app = FastAPI(
 
 #Initialize environment variables.
 # TODO: Need to pass these via environment variables.
-SECRET_KEY = ""
-ALGORITHM = ""
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-ENDPOINT = ""
-KEY = ""
-DATABASE_ID = ""
-CONTAINER_ID = ""
+
+try:
+    settings = Settings()
+
+except:
+    logger.exception("NO ENV VARS FOUND: WILL CONTINUE WITH DEFAULT VALUES. THIS WILL CAUSE APP TO FAIL.")
+    settings = Settings(secret_key="NONE", algorithm="NONE", endpoint="NONE", key="NONE", database_id="NONE", container_id="NONE")
+
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
+ENDPOINT = settings.endpoint
+KEY = settings.key
+DATABASE_ID = settings.database_id
+CONTAINER_ID = settings.container_id
 
 # Initialize services.
 # TODO: Does it make sense to wrap these into its own package to re-use across APIs?
+
+# Setup DB.
+db_options = DbOptions(
+        settings.endpoint, 
+        settings.key,
+        settings.database_id,
+        settings.container_id
+    )
+
+users_db = DbService(db_options)
+
 def init_token_helper() -> TokenHelper:
     """
     Initializes a token helper service.
@@ -61,7 +81,6 @@ def init_bcrypt_helper() -> BCryptHelper:
 
     return BCryptHelper()
 
-
 def init_users_db() -> DbService:
     """
     Initializes a users database.
@@ -71,16 +90,7 @@ def init_users_db() -> DbService:
     DbService
         The users database.
     """
-    db_options = DbOptions(
-        ENDPOINT, 
-        KEY,
-        DATABASE_ID,
-        CONTAINER_ID
-    )
-
-    users_db = DbService(db_options)
     users_db.connect()
-
     return users_db
 
 
