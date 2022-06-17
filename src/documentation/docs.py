@@ -4,16 +4,18 @@ __all__ = [
     "version",
     "tags_metadata",
     "create_token_responses",
-    "create_user_responses"
+    "create_user_responses",
+    "update_user_responses"
 ]
 
 app_title = "My Finance Advisor Auth API"
 version = "0.0.1-alpha"
 
 description = """
-<strong>This is the My Finance Advisor Authorization API. It handles actions such as: <strong>
+**This is the My Finance Advisor Authorization API. It handles actions such as:**
 ### - Authorization
 ### - User Creation
+### - User Password Update
 """
 
 tags_metadata = [
@@ -81,6 +83,41 @@ create_user_responses = {
         },
     409: {
         "description": "User already exists in the database.",
+        "content": {
+                "application/json": {
+                    "example": {"status_code": 0, "detail": "string"}
+                }
+            }
+        },
+    500: {
+        "description": "Unexpected error occurred.",
+        "content": {
+                "application/json": {
+                    "example": {"status_code": 0, "detail": "string"}
+                }
+            }
+        }
+}
+
+update_user_responses = {
+    400: {
+            "description": "Credentials are invalid.",
+            "content": {
+                "application/json": {
+                    "example": {"status_code": 0, "detail": "string"}
+                }
+            }
+        },
+    403: {
+        "description": "Unauthorized.",
+        "content": {
+                "application/json": {
+                    "example": {"status_code": 0, "detail": "string"}
+                }
+            }
+        },
+    404: {
+        "description": "User not found not found in the database.",
         "content": {
                 "application/json": {
                     "example": {"status_code": 0, "detail": "string"}
