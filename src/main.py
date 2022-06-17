@@ -33,7 +33,7 @@ try:
 
 except:
     logger.exception("NO ENV VARS FOUND WILL CONTINUE WITH DEFAULT VALUES THIS WILL CAUSE APP TO FAIL.")
-    settings = Settings(secret_key="", algorithm="", endpoint="", key="", database_id="", container_id="")
+    settings = Settings(secret_key="NONE", algorithm="NONE", endpoint="NONE", key="NONE", database_id="NONE", container_id="NONE")
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
