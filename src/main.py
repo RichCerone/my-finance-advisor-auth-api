@@ -55,7 +55,6 @@ db_options = DbOptions(
     )
 
 users_db = DbService(db_options)
-users_db.connect()
 
 def init_token_helper() -> TokenHelper:
     """
@@ -91,7 +90,7 @@ def init_users_db() -> DbService:
     DbService
         The users database.
     """
-    
+    users_db.connect()
     return users_db
 
 
