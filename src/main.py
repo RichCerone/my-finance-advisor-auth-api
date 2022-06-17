@@ -26,13 +26,13 @@ app = FastAPI(
 
 #Initialize environment variables.
 # TODO: Need to pass these via environment variables.
-SECRET_KEY = "fd08e89d515e8ce4d77c3c1e2be5db0b"
-ALGORITHM = "HS256"
+SECRET_KEY = ""
+ALGORITHM = ""
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-ENDPOINT = "https://richc94-sandbox.documents.azure.com:443/"
-KEY = "KihfDWPK75FdboM1xLwH3wGMTSAZQPtGZhoIGXQOAbiwZ5IlRMbjKWEJA6AsFDT7lYJSkBRPxsZ9J5ExcrLxYg===="
-DATABASE_ID = "my-finance-advisor-sandbox"
-CONTAINER_ID = "users"
+ENDPOINT = ""
+KEY = ""
+DATABASE_ID = ""
+CONTAINER_ID = ""
 
 # Initialize services.
 # TODO: Does it make sense to wrap these into its own package to re-use across APIs?
