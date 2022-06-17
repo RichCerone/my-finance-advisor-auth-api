@@ -25,15 +25,15 @@ app = FastAPI(
     openapi_tags=tags_metadata
 )
 
-# Initialize services.
-# TODO: Does it make sense to wrap these into its own package to re-use across APIs?
-
 #Initialize environment variables.
 # TODO: Need to pass these via environment variables.
-def init_settings() -> Settings:
-    return Settings()
 
-settings = init_settings()
+try:
+    settings = Settings()
+
+except:
+    logger.exception("NO ENV VARS FOUND WILL CONTINUE WITH DEFAULT VALUES THIS WILL CAUSE APP TO FAIL.")
+    settings = Settings(secret_key="", algorithm="", endpoint="", key="", database_id="", container_id="")
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
@@ -42,6 +42,9 @@ ENDPOINT = settings.endpoint
 KEY = settings.key
 DATABASE_ID = settings.database_id
 CONTAINER_ID = settings.container_id
+
+# Initialize services.
+# TODO: Does it make sense to wrap these into its own package to re-use across APIs?
 
 # Startup DB.
 db_options = DbOptions(
