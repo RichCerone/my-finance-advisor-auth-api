@@ -12,9 +12,15 @@ def init_users_db_override_get_success():
 
     return users_db_mock
 
-def init_users_db_override_upsert_201():
+def init_users_db_override_get_404():
     users_db_mock = Mock()
     users_db_mock.get.return_value = None
+
+    return users_db_mock
+
+def init_users_db_override_upsert_200():
+    users_db_mock = Mock()
+    users_db_mock.get.return_value = json.dumps({"user": "some_username", "password": "some_password"})
     users_db_mock.upsert.return_value = json.dumps({"user": "some_username", "password": "some_password"})
 
     return users_db_mock
@@ -44,41 +50,41 @@ def init_authorize_access_success():
 client = TestClient(app)
 
 # Test
-# Assert a 201 status code is returned.
-def test_create_user_returns_201():
+# Asserts a 200 status code is returned.
+def test_update_user_returns_200():
     app.dependency_overrides[inject_jwt_bearer] = init_jwt_bearer_override_success
     app.dependency_overrides[authorize_access] = init_authorize_access_success
-    app.dependency_overrides[init_users_db] = init_users_db_override_upsert_201
+    app.dependency_overrides[init_users_db] = init_users_db_override_upsert_200
     app.dependency_overrides[init_bcrypt_helper] = init_bcrypt_helper_override_success
     app.dependency_overrides[init_token_helper] = init_token_helper_override_success
 
     creds = Credentials(username="user",password="password")
-    response = client.post("/users/", data=creds.json())
+    response = client.put("/users/", data=creds.json())
 
-    assert response.status_code == 201
+    assert response.status_code == 200
 
 # Assert a 400 status code is returned.
-def test_create_user_returns_400():
+def test_update_user_returns_400():
     creds = Credentials(username=" ",password="password")
-    response = client.post("/users/", data=creds.json())
+    response = client.put("/users/", data=creds.json())
 
     assert response.status_code == 400
 
-# Assert a 409 status code 
-def test_create_user_returns_409():
+# Assert a 404 status code is returned.
+def test_update_user_returns_404():
     app.dependency_overrides[inject_jwt_bearer] = init_jwt_bearer_override_success
     app.dependency_overrides[authorize_access] = init_authorize_access_success
-    app.dependency_overrides[init_users_db] = init_users_db_override_get_success
+    app.dependency_overrides[init_users_db] = init_users_db_override_get_404
     app.dependency_overrides[init_bcrypt_helper] = init_bcrypt_helper_override_success
     app.dependency_overrides[init_token_helper] = init_token_helper_override_success
 
     creds = Credentials(username="user",password="password")
-    response = client.post("/users/", data=creds.json())
+    response = client.put("/users/", data=creds.json())
 
-    assert response.status_code == 409
+    assert response.status_code == 404
 
 # Assert a 500 status code is returned.
-def test_create_user_returns_500():
+def test_update_user_returns_500():
     app.dependency_overrides[inject_jwt_bearer] = init_jwt_bearer_override_success
     app.dependency_overrides[authorize_access] = init_authorize_access_success
     app.dependency_overrides[init_users_db] = init_users_db_override_upsert_500

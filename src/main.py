@@ -26,13 +26,13 @@ app = FastAPI(
 
 #Initialize environment variables.
 # TODO: Need to pass these via environment variables.
-SECRET_KEY = ""
-ALGORITHM = ""
+SECRET_KEY = "fd08e89d515e8ce4d77c3c1e2be5db0b"
+ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-ENDPOINT = ""
-KEY = ""
-DATABASE_ID = ""
-CONTAINER_ID = ""
+ENDPOINT = "https://richc94-sandbox.documents.azure.com:443/"
+KEY = "KihfDWPK75FdboM1xLwH3wGMTSAZQPtGZhoIGXQOAbiwZ5IlRMbjKWEJA6AsFDT7lYJSkBRPxsZ9J5ExcrLxYg===="
+DATABASE_ID = "my-finance-advisor-sandbox"
+CONTAINER_ID = "users"
 
 # Initialize services.
 # TODO: Does it make sense to wrap these into its own package to re-use across APIs?
@@ -272,6 +272,53 @@ user: str = Depends(authorize_access)):
  
         elif e.__class__ == UserAlreadyExists:
             raise HTTPException(status_code=409, detail=e.message)
+
+        else:
+            raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+
+@app.put("/users/", responses=update_user_responses, dependencies=[Depends(inject_jwt_bearer), Depends(credential_validation)], response_model=Credentials, tags=["users"])
+def update_user(credentials: Credentials, 
+users_db: DbService = Depends(init_users_db), 
+bcrypt_helper: BCryptHelper = Depends(init_bcrypt_helper),
+user: str = Depends(authorize_access)):
+    """
+    Updates the user's password.
+    """
+
+    try:
+        logger.info("User '{0}' updating user.".format(user))
+        logger.debug("User '{0}' being updated.".format(credentials.username))
+        logger.debug("Hashing password.")
+
+        credentials.password = bcrypt_helper.get_password_hash(credentials.password)
+        
+        logger.debug("Password hashed.")
+        logger.debug("Checking if user '{0}' exists.".format(credentials.username))
+
+        user_in_db = User(credentials.username, credentials.password)
+        if users_db.get(user_in_db.id, user_in_db.user) is None:
+            logger.warning("User '{0}' does not exist in the database.".format(user_in_db.user))
+            raise UserNotFoundError("User not found: '{0}'".format(credentials.username))
+
+        logger.debug("User '{0}' exists.".format(credentials.username))
+        logger.debug("Upserting user: '{0}'".format(credentials.username))
+
+        user_json = users_db.upsert(user_in_db.__dict__)
+        user_payload = json.loads(user_json)
+
+        logger.info("User '{0}' updated.".format(user_payload["user"]))
+
+        return credentials
+
+
+    except Exception as e:
+        logger.exception("PUT exception on 'update_user' -> {0}".format(e))
+        
+        if e.__class__ == ValueError:
+            raise HTTPException(status_code=400, detail=str(e))
+ 
+        elif e.__class__ == UserNotFoundError:
+            raise HTTPException(status_code=404, detail=e.message)
 
         else:
             raise HTTPException(status_code=500, detail="An unexpected error occurred.")
