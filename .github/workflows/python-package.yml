@@ -44,7 +44,7 @@ jobs:
         echo ALGORITHM=${{ secrets.algorithm }} >> .env
         echo ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.access_token_expire_minutes }} >> .env
         echo ENDPOINT=${{ secrets.endpoint }} >> .env
-        ech KEY=${{ secrets.key }} >> .env
+        echo KEY=${{ secrets.key }} >> .env
         DATABASE_ID=${{ secrets.database_id }} >> .env
         CONTAINER_ID=${{ secrets.container_id }} >> .env
         cat .env
