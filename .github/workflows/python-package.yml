@@ -40,13 +40,13 @@ jobs:
     - name: Build env
       run: |
         touch .env
-        echo SECRET_KEY=${{ secrete_key }}
-        echo ALGORITHM=${{ algorithm }}
-        echo ACCESS_TOKEN_EXPIRE_MINUTES=${{ access_token_expire_minutes }}
-        echo ENDPOINT=${{ endpoint }}
-        ech KEY=${{ key }}
-        DATABASE_ID=${{ database_id }}
-        CONTAINER_ID=${{ container_id }}
+        echo SECRET_KEY=${{ secrets.secrete_key }} >> .env
+        echo ALGORITHM=${{ secrets.algorithm }} >> .env
+        echo ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.access_token_expire_minutes }} >> .env
+        echo ENDPOINT=${{ secrets.endpoint }} >> .env
+        ech KEY=${{ secrets.key }} >> .env
+        DATABASE_ID=${{ secrets.database_id }} >> .env
+        CONTAINER_ID=${{ secrets.container_id }} >> .env
         cat .env
 
     - name: Test with pytest
