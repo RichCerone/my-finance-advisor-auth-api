@@ -28,12 +28,7 @@ app = FastAPI(
 #Initialize environment variables.
 # TODO: Need to pass these via environment variables.
 
-try:
-    settings = Settings()
-
-except:
-    logger.exception("NO ENV VARS FOUND: WILL CONTINUE WITH DEFAULT VALUES. THIS WILL CAUSE APP TO FAIL.")
-    settings = Settings(secret_key="NONE", algorithm="NONE", endpoint="NONE", key="NONE", database_id="NONE", container_id="NONE")
+settings = Settings()
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
