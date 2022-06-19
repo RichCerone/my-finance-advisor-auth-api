@@ -39,15 +39,15 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Build env
       run: |
-      touch .env
-      echo SECRET_KEY=${{ secrete_key }}
-      echo ALGORITHM=${{ algorithm }}
-      echo ACCESS_TOKEN_EXPIRE_MINUTES=${{ access_token_expire_minutes }}
-      echo ENDPOINT=${{ endpoint }}
-      ech KEY=${{ key }}
-      DATABASE_ID=${{ database_id }}
-      CONTAINER_ID=${{ container_id }}
-      cat .env
+        touch .env
+        echo SECRET_KEY=${{ secrets.secret_key }} >> .env
+        echo ALGORITHM=${{ secrets.algorithm }} >> .env
+        echo ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.access_token_expire_minutes }} >> .env
+        echo ENDPOINT=${{ secrets.endpoint }} >> .env
+        echo KEY=${{ secrets.key }} >> .env
+        echo DATABASE_ID=${{ secrets.database_id }} >> .env
+        echo CONTAINER_ID=${{ secrets.container_id }} >> .env
+        cat .env
 
     - name: Test with pytest
       run: |
