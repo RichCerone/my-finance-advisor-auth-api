@@ -1,6 +1,7 @@
 from pydantic import BaseSettings
 
 class Settings(BaseSettings):
+    origins: list[str]
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int = 30
