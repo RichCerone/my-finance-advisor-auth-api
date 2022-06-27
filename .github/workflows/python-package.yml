@@ -40,7 +40,7 @@ jobs:
     - name: Build env
       run: |
         touch .env
-        echo ORIGNS='${{ secrets.origins }}' >> .env
+        echo ORIGNS=${{ secrets.origins }} >> .env
         echo SECRET_KEY=${{ secrets.secret_key }} >> .env
         echo ALGORITHM=${{ secrets.algorithm }} >> .env
         echo ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.access_token_expire_minutes }} >> .env
