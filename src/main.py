@@ -3,6 +3,7 @@ import src.libs.model_validation.ModelValidators as ModelValidators
 import logging as logger
 
 from fastapi import Depends, FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError
 from src.exceptions.UserNotFoundError import UserNotFoundError
 from src.exceptions.UserAlreadyExistsError import UserAlreadyExists
@@ -37,6 +38,15 @@ ENDPOINT = settings.endpoint
 KEY = settings.key
 DATABASE_ID = settings.database_id
 CONTAINER_ID = settings.container_id
+ORIGIN_LIST = [settings.origins.split(",")]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ORIGIN_LIST,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Initialize services.
 # TODO: Does it make sense to wrap these into its own package to re-use across APIs?
