@@ -38,7 +38,7 @@ ENDPOINT = settings.endpoint
 KEY = settings.key
 DATABASE_ID = settings.database_id
 CONTAINER_ID = settings.container_id
-ORIGIN_LIST = [settings.origins.split(",")]
+ORIGIN_LIST = settings.origins.split(",")
 
 app.add_middleware(
     CORSMiddleware,
