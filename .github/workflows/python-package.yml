@@ -54,11 +54,13 @@ jobs:
         python -m pytest
 
     - name: Login via Azure CLI
+      if: github.ref == 'refs/heads/main'
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         
     - name: Build and push image
+      if: github.ref == 'refs/heads/main'
       uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
@@ -69,6 +71,7 @@ jobs:
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
 
     - name: Deploy to Azure Container Instances
+      if: github.ref == 'refs/heads/main'
       uses: 'azure/aci-deploy@v1'
       with:
         resource-group: ${{ secrets.RESOURCE_GROUP }}
