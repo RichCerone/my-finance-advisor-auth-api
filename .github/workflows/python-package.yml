@@ -59,7 +59,7 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         
-    - name: Build and push image
+    - name: Login to Azure docker repository
       if: github.ref == 'refs/heads/main'
       uses: azure/docker-login@v1
       with:
@@ -67,10 +67,10 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     
-    if: github.ref == 'refs/heads/main'
-    - run: |
-      docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
-      docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
+    - name: Build and push image
+      run: |
+        docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
 
     - name: Deploy to Azure Container Instances
       if: github.ref == 'refs/heads/main'
