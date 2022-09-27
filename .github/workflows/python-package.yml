@@ -66,9 +66,11 @@ jobs:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-      run: |
-        docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
-        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
+    
+    if: github.ref == 'refs/heads/main'
+    - run: |
+      docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
+      docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
 
     - name: Deploy to Azure Container Instances
       if: github.ref == 'refs/heads/main'
