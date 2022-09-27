@@ -66,7 +66,7 @@ jobs:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-    - run: |
+      run: |
         docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/mfa-auth-api:${{ github.sha }}
 
