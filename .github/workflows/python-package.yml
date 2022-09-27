@@ -49,7 +49,7 @@ jobs:
         echo CONTAINER_ID=${{ secrets.container_id }} >> .env
         cat .env
 
-  tests:
+  test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
